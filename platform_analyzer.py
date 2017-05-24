@@ -85,27 +85,20 @@ class Analyzer(WebInfoTarget):
 	class InvalidContent(Exception):
 		pass
 
-	def __init__(self, site_url):
+	def __init__(self, response):
 		self.apps = APPS_DATA_COMPILED.copy()
-		super(Analyzer, self).__init__(site_url)
-
+		super(Analyzer, self).__init__()
+		self.result_platform = self.get_result(response)
 
 	
 
 
 
-	def analyze(self, timeout=10):
+	def get_result(self, response):
 		detected_apps = []
 
 
-		response = requests.get(
-			self.resource_url,
-			allow_redirects=True,
-			timeout=timeout,
-			headers={'User-Agent': USER_AGENT},
-			verify=True,
-			stream=True
-		)
+		
 
 		response.raise_for_status()
 

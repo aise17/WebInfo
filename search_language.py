@@ -3,20 +3,22 @@ from bs4 import BeautifulSoup
 
 
 class SearchLanguage(WebInfoTarget):
-	def __init__(self, site_url):
-		super(SearchLanguage,self).__init__(site_url)
+	def __init__(self, response):
+		super(SearchLanguage,self).__init__()
+		self.result_lang = self.get_result(response)
 
 
-
-	def get_result(self):
+	def get_result(self, response):
 		'''
 		scraping a web for extraction a lang
 		Args:
 			soup(string): this variable contains the organized mark language
 		'''
-		for lang in self.soup.findAll('html'):
-			return lang.attrs 
 		
+		soup = BeautifulSoup(response.text, "html.parser")
+		for lang in soup.findAll('html'):
+			result_lang = lang.attrs
+			return result_lang['lang']
 '''
 search = SearchLanguage('comprarseguridad.es')
 

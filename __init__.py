@@ -24,75 +24,67 @@ def main():
 			count += 1
 			manager.resultados = {'url': '','alexa': '', 'status': '', 'platform': '', 'language': '', 'mail': ['']}
 
+
 		#ALEXA RANK
 			alexa_rank = AlexaRank(url)
-			result_alexarank = alexa_rank.get_result()
-			
-			print result_alexarank
-			manager.resultados['alexa'] = result_alexarank
+			print alexa_rank.url_alexa
+			print alexa_rank.result_alexa
+			manager.resultados['alexa'] = alexa_rank.result_alexa
 
 			print manager.resultados
+
 		
-
 		#STATUS
-			status = Status(url)
-			rstatus = status.get_result()
-			print rstatus
-			manager.resultados['url'] = status.resource_url
-			manager.resultados['status'] = rstatus
-
-
-			print manager.resultados
-
-
-
-			if rstatus == 200: 
-
-			#PLATFORM ANALYZER
-				analyzer = Analyzer(url)
-				result_analyzer = analyzer.analyze()
-				print result_analyzer
-				manager.resultados['platform'] = result_analyzer
-
-
+			try:
+				status = Status(url)
+				print status.resource_url
+				print status.result_status
+				manager.resultados['url'] = status.resource_url
+				manager.resultados['status'] = status.result_status
+		
 				print manager.resultados
+
+				if status.result_status == 200:
+
+		#PLATFORM ANALYZER
+					analizer = Analyzer(status.response)
+					print analizer.result_platform
+					manager.resultados['platform'] = analizer.result_platform
+
+					print manager.resultados
 
 
 			#SEARCH LANGUAGE USE IN THE WEB
-				search_lang = SearchLanguage(url)
-				result_lang = search_lang.get_result()
-				print result_lang
-				try:
-					manager.resultados['language'] = result_lang['lang'] 
-				except KeyError:
+					search_lang = SearchLanguage(status.response)
+					print search_lang.result_lang
 					try:
-						manager.resultados['language'] = result_lang['xml:lang'] 
-					except:
-						manager.resultados['language'] = result_lang					
-					
+						manager.resultados['language'] = search_lang.result_lang
+					except:	
+						try:
+							manager.resultados['language'] = search_lang.result_lang['lang'] 
+						except KeyError:
+							try:
+								manager.resultados['language'] = search_lang.result_lang['xml:lang'] 
+							except:
+								manager.resultados['language'] = search_lang.result_lang
 				
-
-
-
-				print manager.resultados
+					print manager.resultados
 
 
 			# SEARCH ITEMS OF CONTACT
-				search_contact = SearchContact(url)
-				search_contact.get_result()
-				print search_contact.resource_url
-				for mail in search_contact.mail_result:
-					if mail not in manager.resultados['mail']:
-						manager.resultados['mail'].append(mail)
-				join = ','
-				manager.resultados['mail'] = join.join(manager.resultados['mail'])
-				print manager.resultados
-				
-
+					search_contact = SearchContact(status.response)
+					print search_contact.mail_result
+					for mail in search_contact.mail_result:
+						if mail not in manager.resultados['mail']:
+							manager.resultados['mail'].append(mail)
+					join = ','
+					manager.resultados['mail'] = join.join(manager.resultados['mail'])
+					print manager.resultados
+			except: 
+				print 'Connection timed out #################################################'
 
 			manager.export()
 			del manager.resultados
-
 
 if __name__ == '__main__':
 	main()

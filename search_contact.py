@@ -5,15 +5,17 @@ import requests
 
 class SearchContact(WebInfoTarget):
 	
-	def __init__(self, site_url):
-		super(SearchContact, self).__init__(site_url)
+	def __init__(self, response):
+		super(SearchContact, self).__init__()
 		self.mail_result = []
-
-
+		self.result_contact = self.get_result(response)
+	
+	'''
 	def get_result(self):
 		self.get_mail()
 		self.iter_site_web()
-		
+	'''	
+
 	def iter_site_web(self):
 		
 		resource_url =  self.resource_url + '/content/'
@@ -23,21 +25,20 @@ class SearchContact(WebInfoTarget):
 			print self.resource_url
 
 
-	def get_mail(self):
+	def get_result(self, response):
 		
 		
-		self.response = requests.get(self.resource_url, allow_redirects=True)
-		self.soup = BeautifulSoup(self.response.text, "html.parser")
-
 		query = r"([\w\.-]+)@([\w\.-]+)(\.[\w\.]+)"
 		regex = re.compile(query)
 
-		for s in self.soup.find_all('span'):
+
+		soup = BeautifulSoup(response.text, "html.parser")
+		for s in soup.find_all('span'):
 			s = s.text
 			
 			match = regex.search(s)
 			if match: 
-				self.mail_result.append(match.group())
+				return self.mail_result.append(match.group())
 			
 			
 	def get_Phone(self):
